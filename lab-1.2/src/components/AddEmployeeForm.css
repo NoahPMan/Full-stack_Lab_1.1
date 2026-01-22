@@ -1,0 +1,48 @@
+.add-employee {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.add-employee__title {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.add-employee__errors {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+.add-employee__form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 420px;
+}
+
+.add-employee__field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.add-employee__label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.add-employee__input,
+.add-employee__select {
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+}
+
+.add-employee__button {
+  width: fit-content;
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  border: 0;
+  cursor: pointer;
+}
