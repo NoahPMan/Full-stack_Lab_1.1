@@ -104,4 +104,3 @@ export default function AddEmployeeForm({ departmentNames, onAddEmployee }: Prop
     </section>
   );
 }
-
