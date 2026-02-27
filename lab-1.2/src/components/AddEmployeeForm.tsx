@@ -1,56 +1,61 @@
-import { useState } from "react";
+import React, { useMemo } from "react";
 import "./AddEmployeeForm.css";
+import { useFormInput } from "../hooks/useFormInput";
+import { employeeRepo } from "../repos/employeeRepo";
+import { employeeService } from "../services/employeeService";
 
 type Props = {
-  departmentNames: string[];
-  onAddEmployee: (firstName: string, lastName: string, departmentName: string) => void;
+  onAdded?: () => void;
 };
 
-export default function AddEmployeeForm({ departmentNames, onAddEmployee }: Props) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [departmentName, setDepartmentName] = useState(departmentNames[0] ?? "");
-  const [errors, setErrors] = useState<string[]>([]);
+export default function AddEmployeeForm({ onAdded }: Props) {
+  const departments = useMemo(() => employeeRepo.getDepartments(), []);
+  const firstName = useFormInput<string>("");
+  const lastName = useFormInput<string>("");
+  const departmentId = useFormInput<string>(departments[0]?.id ?? "");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const newErrors: string[] = [];
+    const uiValid =
+      firstName.validate(v =>
+        !v || v.trim().length === 0 ? "First name is required." : null
+      ) &&
+      departmentId.validate(v =>
+        !v ? "Please select a department." : null
+      );
 
-    if (firstName.trim().length < 3) {
-      newErrors.push("First name must be at least 3 characters.");
-    }
+    if (!uiValid) return;
+    const result = employeeService.createEmployee({
+      firstName: firstName.value,
+      lastName: lastName.value,
+      departmentId: departmentId.value,
+    });
 
-    if (!departmentNames.includes(departmentName)) {
-      newErrors.push("Please select a valid department.");
-    }
-
-    if (newErrors.length > 0) {
-      setErrors(newErrors);
+    if (!result.ok) {
+      result.errors.forEach(err => {
+        if (err.field === "firstName") {
+          firstName.clearMessages();
+          firstName.validate(() => err.message);
+        } else if (err.field === "departmentId") {
+          departmentId.clearMessages();
+          departmentId.validate(() => err.message);
+        }
+      });
       return;
     }
+    firstName.setValue("");
+    lastName.setValue("");
+    departmentId.setValue(departments[0]?.id ?? "");
+    firstName.clearMessages();
+    departmentId.clearMessages();
 
-    onAddEmployee(firstName.trim(), lastName.trim(), departmentName);
-
-    setErrors([]);
-    setFirstName("");
-    setLastName("");
-    setDepartmentName(departmentNames[0] ?? "");
+    if (onAdded) onAdded();
   }
 
   return (
     <section className="add-employee">
       <h2 className="add-employee__title">Add Employee</h2>
-
-      {errors.length > 0 && (
-        <div className="add-employee__errors" role="alert">
-          <ul>
-            {errors.map((msg) => (
-              <li key={msg}>{msg}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <form className="add-employee__form" onSubmit={handleSubmit}>
         <div className="add-employee__field">
@@ -60,10 +65,16 @@ export default function AddEmployeeForm({ departmentNames, onAddEmployee }: Prop
           <input
             id="firstName"
             className="add-employee__input"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={firstName.value}
+            onChange={firstName.onChange}
             placeholder="e.g., Noah"
           />
+          {/* Field-level messages (plural) */}
+          {firstName.messages.map((msg, i) => (
+            <div key={i} className="add-employee__errors" role="alert">
+              {msg}
+            </div>
+          ))}
         </div>
 
         <div className="add-employee__field">
@@ -73,8 +84,8 @@ export default function AddEmployeeForm({ departmentNames, onAddEmployee }: Prop
           <input
             id="lastName"
             className="add-employee__input"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            value={lastName.value}
+            onChange={lastName.onChange}
             placeholder="e.g., Manaigre"
           />
         </div>
@@ -86,15 +97,20 @@ export default function AddEmployeeForm({ departmentNames, onAddEmployee }: Prop
           <select
             id="department"
             className="add-employee__select"
-            value={departmentName}
-            onChange={(e) => setDepartmentName(e.target.value)}
+            value={departmentId.value}
+            onChange={departmentId.onChange}
           >
-            {departmentNames.map((dep) => (
-              <option key={dep} value={dep}>
-                {dep}
+            {departments.map(dep => (
+              <option key={dep.id} value={dep.id}>
+                {dep.name}
               </option>
             ))}
           </select>
+          {departmentId.messages.map((msg, i) => (
+            <div key={i} className="add-employee__errors" role="alert">
+              {msg}
+            </div>
+          ))}
         </div>
 
         <button className="add-employee__button" type="submit">

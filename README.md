@@ -71,3 +71,9 @@ Dynamically displays the current year.
 
 Both labs were completed on their own branches.  
 Lab 1.2 was later merged into `main` for deployment to Vercel, as required.
+
+
+---------------------------------------------------------------------------
+## Lab_3.1
+
+Description:

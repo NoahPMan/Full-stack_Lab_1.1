@@ -4,6 +4,11 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 
+import { hydrateFromGroupedSeed } from "./repos/employeeRepo";
+import { groupedSeed } from "./data/seed";
+
+hydrateFromGroupedSeed(groupedSeed);
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>

@@ -1,46 +1,36 @@
 import { useMemo, useState } from "react";
-import type { Department, Employee } from "../data/types";
-import data from "../data/employees.json";
+import { employeeRepo } from "../repos/employeeRepo";
 import DepartmentSection from "./Department";
 import AddEmployeeForm from "./AddEmployeeForm";
 
-const initialDepartments = data as Department[];
-
 export default function Directory() {
-  const [departments, setDepartments] = useState<Department[]>(initialDepartments);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const departments = useMemo(() => employeeRepo.getDepartments(), []);
+  const employees = useMemo(() => employeeRepo.getEmployees(), [refreshKey]);
 
-  const departmentNames = useMemo(() => departments.map((d) => d.name), [departments]);
-
-  function handleAddEmployee(firstName: string, lastName: string, departmentName: string) {
-    setDepartments((prev) => {
-      const deptIndex = prev.findIndex((d) => d.name === departmentName);
-      if (deptIndex === -1) return prev;
-
-      const newEmployee: Employee = {
-        firstName,
-        lastName: lastName.length > 0 ? lastName : "Employee",
-      };
-
-      const updated = [...prev];
-      const targetDept = updated[deptIndex];
-
-      updated[deptIndex] = {
-        ...targetDept,
-        employees: [...targetDept.employees, newEmployee],
-      };
-
-      return updated;
+  const sections = useMemo(() => {
+    const map = new Map<
+      string,
+      { id: string; name: string; employees: { firstName: string; lastName: string }[] }
+    >();
+    departments.forEach(d => map.set(d.id, { id: d.id, name: d.name, employees: [] }));
+    employees.forEach(e => {
+      const bucket = map.get(e.departmentId);
+      if (bucket) bucket.employees.push({ firstName: e.firstName, lastName: e.lastName });
     });
-  }
+    return Array.from(map.values());
+  }, [departments, employees]);
 
   return (
     <main id="employee-directory">
-      {departments.map((d, i) => (
-        <DepartmentSection key={i} name={d.name} employees={d.employees} />
+      {sections.map(section => (
+        <DepartmentSection
+          key={section.id}
+          name={section.name}
+          employees={section.employees}
+        />
       ))}
-
-      <AddEmployeeForm departmentNames={departmentNames} onAddEmployee={handleAddEmployee} />
+      <AddEmployeeForm onAdded={() => setRefreshKey(k => k + 1)} />
     </main>
   );
 }
-``
