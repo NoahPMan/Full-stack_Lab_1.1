@@ -123,6 +123,16 @@ Hook: local UI state and field validation
 Service: business rules
 Repository: data management
 
+---
+
 ## Lab_3.2
 
-Description:
+### Description:
+
+Implements Organization role creation using Hook → Service → Repository. The page reads roles from `orgRepo` (single source of truth). `OrgAddPersonForm` uses `useFormInput` for field state/messages and `orgService` to validate first name (≥ 3) and prevent assigning a person to an already-occupied role. The Organization page re-reads from the repo after a successful add, keeping UI and data in sync.
+
+---
+
+## Lab_4.1
+
+### Description
