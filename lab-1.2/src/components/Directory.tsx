@@ -22,15 +22,18 @@ export default function Directory() {
   }, [departments, employees]);
 
   return (
-    <main id="employee-directory">
-      {sections.map(section => (
+    <main id= "employee-directory" >
+    {
+      sections.map(section => (
         <DepartmentSection
-          key={section.id}
-          name={section.name}
-          employees={section.employees}
+          key= { section.id }
+          name = { section.name }
+          employees = { section.employees }
         />
-      ))}
-      <AddEmployeeForm onAdded={() => setRefreshKey(k => k + 1)} />
-    </main>
+      ))
+    }
+    < AddEmployeeForm onAdded = {() => setRefreshKey(k => k + 1)
+} />
+  </main>
   );
 }

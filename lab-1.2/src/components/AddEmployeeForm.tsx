@@ -54,69 +54,75 @@ export default function AddEmployeeForm({ onAdded }: Props) {
   }
 
   return (
-    <section className="add-employee">
-      <h2 className="add-employee__title">Add Employee</h2>
+    <section className= "add-employee" >
+    <h2 className="add-employee__title" > Add Employee </h2>
 
-      <form className="add-employee__form" onSubmit={handleSubmit}>
-        <div className="add-employee__field">
-          <label className="add-employee__label" htmlFor="firstName">
+      < form className = "add-employee__form" onSubmit = { handleSubmit } >
+        <div className="add-employee__field" >
+          <label className="add-employee__label" htmlFor = "firstName" >
             First Name
-          </label>
-          <input
-            id="firstName"
-            className="add-employee__input"
-            value={firstName.value}
-            onChange={firstName.onChange}
-            placeholder="e.g., Noah"
-          />
-          {/* Field-level messages (plural) */}
-          {firstName.messages.map((msg, i) => (
-            <div key={i} className="add-employee__errors" role="alert">
-              {msg}
-            </div>
-          ))}
-        </div>
+              </label>
+              < input
+  id = "firstName"
+  className = "add-employee__input"
+  value = { firstName.value }
+  onChange = { firstName.onChange }
+  placeholder = "e.g., Noah"
+    />
+    {/* Field-level messages (plural) */ }
+  {
+    firstName.messages.map((msg, i) => (
+      <div key= { i } className = "add-employee__errors" role = "alert" >
+      { msg }
+      </div>
+    ))
+  }
+  </div>
 
-        <div className="add-employee__field">
-          <label className="add-employee__label" htmlFor="lastName">
-            Last Name
+    < div className = "add-employee__field" >
+      <label className="add-employee__label" htmlFor = "lastName" >
+        Last Name
           </label>
-          <input
-            id="lastName"
-            className="add-employee__input"
-            value={lastName.value}
-            onChange={lastName.onChange}
-            placeholder="e.g., Manaigre"
-          />
-        </div>
+          < input
+  id = "lastName"
+  className = "add-employee__input"
+  value = { lastName.value }
+  onChange = { lastName.onChange }
+  placeholder = "e.g., Manaigre"
+    />
+    </div>
 
-        <div className="add-employee__field">
-          <label className="add-employee__label" htmlFor="department">
-            Department
-          </label>
-          <select
-            id="department"
-            className="add-employee__select"
-            value={departmentId.value}
-            onChange={departmentId.onChange}
-          >
-            {departments.map(dep => (
-              <option key={dep.id} value={dep.id}>
-                {dep.name}
-              </option>
-            ))}
-          </select>
-          {departmentId.messages.map((msg, i) => (
-            <div key={i} className="add-employee__errors" role="alert">
-              {msg}
-            </div>
-          ))}
-        </div>
+    < div className = "add-employee__field" >
+      <label className="add-employee__label" htmlFor = "department" >
+        Department
+        </label>
+        < select
+  id = "department"
+  className = "add-employee__select"
+  value = { departmentId.value }
+  onChange = { departmentId.onChange }
+    >
+  {
+    departments.map(dep => (
+      <option key= { dep.id } value = { dep.id } >
+      { dep.name }
+      </option>
+    ))
+  }
+    </select>
+  {
+    departmentId.messages.map((msg, i) => (
+      <div key= { i } className = "add-employee__errors" role = "alert" >
+      { msg }
+      </div>
+    ))
+  }
+  </div>
 
-        <button className="add-employee__button" type="submit">
-          Add
-        </button>
+    < button className = "add-employee__button" type = "submit" >
+      Add
+      </button>
       </form>
-    </section>
+      </section>
   );
 }

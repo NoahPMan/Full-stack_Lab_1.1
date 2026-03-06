@@ -27,7 +27,8 @@ body {
   min-height: 100vh;
 }
 
-#root, #app {
+#root,
+#app {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 16px 32px;

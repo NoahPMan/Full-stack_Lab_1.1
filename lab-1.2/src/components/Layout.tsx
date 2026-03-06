@@ -6,19 +6,19 @@ import "./Layout.css";
 export default function Layout() {
   return (
     <>
-      <Header />
-      <nav className="nav">
-        <NavLink className="nav__link" to="/employees">
-          Employees
+    <Header />
+    < nav className = "nav" >
+      <NavLink className="nav__link" to = "/employees" >
+        Employees
         </NavLink>
-        <NavLink className="nav__link" to="/organization">
+        < NavLink className = "nav__link" to = "/organization" >
           Organization
-        </NavLink>
-      </nav>
+          </NavLink>
+          </nav>
 
-      <Outlet />
+          < Outlet />
 
-      <Footer />
-    </>
+          <Footer />
+          </>
   );
 }

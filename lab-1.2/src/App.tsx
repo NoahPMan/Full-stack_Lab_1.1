@@ -6,11 +6,11 @@ import OrganizationPage from "./components/pages/OrganizationPage";
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="/employees" replace />} />
-        <Route path="employees" element={<EmployeesPage />} />
-        <Route path="organization" element={<OrganizationPage />} />
-      </Route>
-    </Routes>
+    <Route path= "/" element = {< Layout />}>
+      <Route index element = {< Navigate to = "/employees" replace />} />
+        < Route path = "employees" element = {< EmployeesPage />} />
+          < Route path = "organization" element = {< OrganizationPage />} />
+            </Route>
+            </Routes>
   );
 }
