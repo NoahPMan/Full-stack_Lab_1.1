@@ -1,0 +1,31 @@
+.org {
+  padding: 1rem;
+}
+
+.org__title {
+  margin: 0 0 1rem 0;
+}
+
+.org__list {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 760px;
+}
+
+.org__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+.org__name {
+  font-weight: 600;
+}
+
+.org__role {
+  text-align: right;
+  opacity: 0.9;
+}
