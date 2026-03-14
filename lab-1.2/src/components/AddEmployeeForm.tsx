@@ -35,23 +35,21 @@ export default function AddEmployeeForm({ onAdded }: Props) {
     };
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const uiValid =
       firstName.validate(v => (!v || v.trim().length === 0 ? "First name is required." : null)) &&
       departmentId.validate(v => (!v ? "Please select a department." : null));
-
     if (!uiValid) return;
 
-    const result = employeeService.createEmployee({
+    const v = employeeService.validate({
       firstName: firstName.value,
       lastName: lastName.value,
       departmentId: departmentId.value,
     });
-
-    if (!result.ok) {
-      result.errors.forEach(err => {
+    if (!v.ok) {
+      v.errors.forEach(err => {
         if (err.field === "firstName") {
           firstName.clearMessages();
           firstName.validate(() => err.message);
@@ -60,6 +58,18 @@ export default function AddEmployeeForm({ onAdded }: Props) {
           departmentId.validate(() => err.message);
         }
       });
+      return;
+    }
+
+    try {
+      await employeeRepo.createEmployee({
+        firstName: firstName.value.trim(),
+        lastName: lastName.value.trim(),
+        departmentId: departmentId.value,
+      });
+    } catch (err: any) {
+      departmentId.clearMessages();
+      departmentId.validate(() => err?.message ?? "Failed to create employee");
       return;
     }
 
