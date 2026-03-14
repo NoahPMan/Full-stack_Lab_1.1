@@ -1,31 +1,49 @@
-import React, { useMemo } from "react";
+import { useEffect, useState } from "react";
 import "./AddEmployeeForm.css";
 import { useFormInput } from "../hooks/useFormInput";
-import { employeeRepo } from "../repos/employeeRepo";
+import { employeeRepo, type Department } from "../repos/employeeRepo";
 import { employeeService } from "../services/employeeService";
 
-type Props = {
-  onAdded?: () => void;
-};
+type Props = { onAdded?: () => void };
 
 export default function AddEmployeeForm({ onAdded }: Props) {
-  const departments = useMemo(() => employeeRepo.getDepartments(), []);
+  const [deps, setDeps] = useState<Department[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const firstName = useFormInput<string>("");
   const lastName = useFormInput<string>("");
-  const departmentId = useFormInput<string>(departments[0]?.id ?? "");
+  const departmentId = useFormInput<string>("");
+
+  useEffect(() => {
+    let mounted = true;
+    employeeRepo
+      .getDepartments()
+      .then(d => {
+        if (!mounted) return;
+        setDeps(d);
+        setLoading(false);
+        if (d.length && !departmentId.value) departmentId.setValue(d[0].id);
+      })
+      .catch(e => {
+        if (!mounted) return;
+        setLoadError(e?.message ?? "Failed to load departments");
+        setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const uiValid =
-      firstName.validate(v =>
-        !v || v.trim().length === 0 ? "First name is required." : null
-      ) &&
-      departmentId.validate(v =>
-        !v ? "Please select a department." : null
-      );
+      firstName.validate(v => (!v || v.trim().length === 0 ? "First name is required." : null)) &&
+      departmentId.validate(v => (!v ? "Please select a department." : null));
 
     if (!uiValid) return;
+
     const result = employeeService.createEmployee({
       firstName: firstName.value,
       lastName: lastName.value,
@@ -44,9 +62,10 @@ export default function AddEmployeeForm({ onAdded }: Props) {
       });
       return;
     }
+
     firstName.setValue("");
     lastName.setValue("");
-    departmentId.setValue(departments[0]?.id ?? "");
+    departmentId.setValue(deps[0]?.id ?? "");
     firstName.clearMessages();
     departmentId.clearMessages();
 
@@ -59,31 +78,24 @@ export default function AddEmployeeForm({ onAdded }: Props) {
 
       < form className = "add-employee__form" onSubmit = { handleSubmit } >
         <div className="add-employee__field" >
-          <label className="add-employee__label" htmlFor = "firstName" >
-            First Name
-              </label>
-              < input
+          <label className="add-employee__label" htmlFor = "firstName" > First Name </label>
+            < input
   id = "firstName"
   className = "add-employee__input"
   value = { firstName.value }
   onChange = { firstName.onChange }
   placeholder = "e.g., Noah"
     />
-    {/* Field-level messages (plural) */ }
   {
     firstName.messages.map((msg, i) => (
-      <div key= { i } className = "add-employee__errors" role = "alert" >
-      { msg }
-      </div>
+      <div key= { i } className = "add-employee__errors" role = "alert" > { msg } </div>
     ))
   }
-  </div>
+    </div>
 
     < div className = "add-employee__field" >
-      <label className="add-employee__label" htmlFor = "lastName" >
-        Last Name
-          </label>
-          < input
+      <label className="add-employee__label" htmlFor = "lastName" > Last Name </label>
+        < input
   id = "lastName"
   className = "add-employee__input"
   value = { lastName.value }
@@ -93,36 +105,41 @@ export default function AddEmployeeForm({ onAdded }: Props) {
     </div>
 
     < div className = "add-employee__field" >
-      <label className="add-employee__label" htmlFor = "department" >
-        Department
-        </label>
-        < select
-  id = "department"
-  className = "add-employee__select"
-  value = { departmentId.value }
-  onChange = { departmentId.onChange }
-    >
+      <label className="add-employee__label" htmlFor = "department" > Department </label>
+
   {
-    departments.map(dep => (
-      <option key= { dep.id } value = { dep.id } >
-      { dep.name }
-      </option>
-    ))
+    loading ? (
+      <div>Loading departments…</div>
+          ) : loadError ? (
+      <div className= "add-employee__errors" role = "alert" > { loadError } </div>
+          ) : (
+      <select
+              id= "department"
+    className = "add-employee__select"
+    value = { departmentId.value }
+    onChange = { departmentId.onChange }
+      >
+    {
+      deps.map(d => (
+        <option key= { d.id } value = { d.id } > { d.name } </option>
+      ))
+    }
+      </select>
+          )
   }
-    </select>
+
   {
     departmentId.messages.map((msg, i) => (
-      <div key= { i } className = "add-employee__errors" role = "alert" >
-      { msg }
-      </div>
+      <div key= { i } className = "add-employee__errors" role = "alert" > { msg } </div>
     ))
   }
   </div>
 
-    < button className = "add-employee__button" type = "submit" >
-      Add
-      </button>
-      </form>
-      </section>
+    < button className = "add-employee__button" type = "submit" disabled = { loading || !!loadError
+}>
+  Add
+  </button>
+  </form>
+  </section>
   );
 }
