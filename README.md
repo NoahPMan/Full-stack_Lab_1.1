@@ -136,3 +136,15 @@ Implements Organization role creation using Hook → Service → Repository. The
 ## Lab_4.1
 
 ### Description:
+
+Introduces a real back-end API and refactors the front-end to fetch from it instead of using front-end in-memory data. The solution follows a layered architecture on both sides:
+
+Backend (Express + TypeScript): Route → Controller → Service → Repository with temporary in-memory data for this lab.
+Frontend (React + Vite + TypeScript): Repositories call the API with fetch using VITE_API_BASE_URL; pages load data via useEffect with loading/error states.
+
+No local JSON/seed or hydrator is used on the frontend anymore.
+Technologies
+
+Frontend: React, TypeScript, Vite
+Backend: Node.js, Express, TypeScript, CORS, morgan
+Dev: Nodemon, ts-node

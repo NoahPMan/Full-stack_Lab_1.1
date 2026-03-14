@@ -1,6 +1,3 @@
-import { employeeRepo } from "../repos/employeeRepo";
-import type { Employee } from "../repos/employeeRepo";
-
 export type CreateEmployeeInput = {
   firstName: string;
   lastName: string;
@@ -12,34 +9,23 @@ export type ServiceError = {
   message: string;
 };
 
-export type CreateEmployeeResult =
-  | { ok: true; employee: Employee }
+export type ValidateResult =
+  | { ok: true }
   | { ok: false; errors: ServiceError[] };
 
 export const employeeService = {
-  createEmployee(input: CreateEmployeeInput): CreateEmployeeResult {
+  validate(input: CreateEmployeeInput): ValidateResult {
     const errors: ServiceError[] = [];
+    const first = (input.firstName ?? "").trim();
 
-    const deptExists = employeeRepo.getDepartments().some(d => d.id === input.departmentId);
-    if (!deptExists) {
-      errors.push({ field: "departmentId", message: "Department does not exist." });
-    }
-
-    const first = input.firstName?.trim() ?? "";
     if (first.length < 3) {
       errors.push({ field: "firstName", message: "First name must be at least 3 characters." });
     }
-
-    if (errors.length) {
-      return { ok: false, errors };
+    if (!input.departmentId) {
+      errors.push({ field: "departmentId", message: "Please select a department." });
     }
 
-    const employee = employeeRepo.createEmployee({
-      firstName: first,
-      lastName: (input.lastName ?? "").trim(),
-      departmentId: input.departmentId,
-    });
-
-    return { ok: true, employee };
-  },
+    if (errors.length) return { ok: false, errors };
+    return { ok: true };
+  }
 };

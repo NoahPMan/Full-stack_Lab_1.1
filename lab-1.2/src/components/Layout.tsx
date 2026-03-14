@@ -8,16 +8,10 @@ export default function Layout() {
     <>
     <Header />
     < nav className = "nav" >
-      <NavLink className="nav__link" to = "/employees" >
-        Employees
-        </NavLink>
-        < NavLink className = "nav__link" to = "/organization" >
-          Organization
-          </NavLink>
+      <NavLink className="nav__link" to = "/employees" > Employees </NavLink>
+        < NavLink className = "nav__link" to = "/organization" > Organization </NavLink>
           </nav>
-
           < Outlet />
-
           <Footer />
           </>
   );
