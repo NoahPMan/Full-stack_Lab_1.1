@@ -148,3 +148,9 @@ Technologies
 Frontend: React, TypeScript, Vite
 Backend: Node.js, Express, TypeScript, CORS, morgan
 Dev: Nodemon, ts-node
+
+---
+
+## Lab_4.2
+
+### Description:
