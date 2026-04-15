@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { listEmployees, listDepartments, addEmployee } from "../services/employeeService";
+import { listDepartments, listEmployees, addEmployee } from "../services/employeeService";
 
-export function getEmployeesHandler(_req: Request, res: Response) {
-  res.json(listEmployees());
+export async function getDepartmentsHandler(_req: Request, res: Response) {
+  res.json(await listDepartments());
 }
 
-export function getDepartmentsHandler(_req: Request, res: Response) {
-  res.json(listDepartments());
+export async function getEmployeesHandler(_req: Request, res: Response) {
+  res.json(await listEmployees());
 }
 
-export function createEmployeeHandler(req: Request, res: Response) {
-  const result = addEmployee(req.body);
+export async function createEmployeeHandler(req: Request, res: Response) {
+  const result = await addEmployee(req.body);
   if (!result.ok) return res.status(400).json(result);
   return res.status(201).json(result);
 }

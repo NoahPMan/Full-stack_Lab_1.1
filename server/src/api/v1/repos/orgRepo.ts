@@ -1,30 +1,40 @@
-export type OrgRole = { id: string; roleName: string; assignee?: { firstName: string; lastName: string } };
-
-let roles: OrgRole[] = [
-  { id: "role-1", roleName: "CEO" },
-  { id: "role-2", roleName: "CFO" },
-  { id: "role-3", roleName: "CTO" },
-  { id: "role-4", roleName: "COO" }
-];
-
-const makeId = () => `role-${Math.random().toString(36).slice(2, 8)}`;
+import { prisma } from "../../../prisma";
 
 export function getRoles() {
-  return roles.map(r => ({ ...r, assignee: r.assignee ? { ...r.assignee } : undefined }));
+  return prisma.role.findMany({
+    orderBy: { roleName: "asc" },
+    include: { assignee: true }
+  });
 }
 
 export function getRoleByName(roleName: string) {
-  return roles.find(r => r.roleName.toLowerCase() === roleName.toLowerCase());
+  return prisma.role.findUnique({
+    where: { roleName },
+    include: { assignee: true }
+  });
 }
 
-export function assignPerson(roleName: string, firstName: string, lastName: string) {
-  const found = getRoleByName(roleName);
-  if (found) {
-    const updated = { ...found, assignee: { firstName, lastName } };
-    roles = roles.map(r => (r.id === found.id ? updated : r));
-    return { ...updated };
+export async function assignPerson(roleName: string, firstName: string, lastName: string) {
+  const role = await prisma.role.findUnique({
+    where: { roleName },
+    include: { assignee: true }
+  });
+
+  if (!role) {
+    const person = await prisma.person.create({ data: { firstName, lastName } });
+    return prisma.role.create({
+      data: { roleName, assigneeId: person.id },
+      include: { assignee: true }
+    });
   }
-  const created = { id: makeId(), roleName, assignee: { firstName, lastName } };
-  roles = [...roles, created];
-  return { ...created };
+
+  if (role.assigneeId) return null;
+
+  const person = await prisma.person.create({ data: { firstName, lastName } });
+  return prisma.role.update({
+    where: { roleName },
+    data: { assigneeId: person.id },
+    include: { assignee: true }
+  });
 }
+``
