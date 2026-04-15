@@ -8,8 +8,8 @@
     "build": "npx tsc",
     "start": "node dist/server.js",
     "seed": "prisma db seed",
-    "test": "echo \"No tests yet\" && exit 0",
-    "vercel-build": "prisma migrate deploy && prisma db seed && npm run build"
+    "vercel-build": "prisma migrate deploy && prisma db seed && npm run build",
+    "test": "echo \"No tests yet\" && exit 0"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
