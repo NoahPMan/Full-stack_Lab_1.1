@@ -6,20 +6,26 @@ import orgRoutes from "./api/v1/routes/orgRoutes";
 
 const app = express();
 
-const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    "http://localhost:5173"
-].filter(Boolean) as string[];
+const envOrigins = (process.env.FRONTEND_URL ?? "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
 
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) return callback(null, true);
-            return callback(new Error(`CORS blocked for origin: ${origin}`));
-        }
-    })
-);
+const allowedOrigins = new Set<string>([
+    ...envOrigins,
+    "http://localhost:5173"
+]);
+
+const corsOptions: cors.CorsOptions = {
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.has(origin)) return callback(null, true);
+        return callback(null, false);
+    }
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(morgan("dev"));
