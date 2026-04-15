@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon --ext ts,js,json --exec ts-node src/server.ts",
-    "build": "npx tsc",
+    "build": "node ./node_modules/typescript/bin/tsc",
     "start": "node dist/server.js",
     "seed": "prisma db seed",
     "vercel-build": "prisma generate && prisma migrate deploy && prisma db seed && npm run build",
