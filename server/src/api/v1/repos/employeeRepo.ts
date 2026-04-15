@@ -1,15 +1,15 @@
-import { employees, departments, makeEmpId } from "./memory";
+import { prisma } from "../../../prisma";
 
 export function getDepartments() {
-    return departments.map(d => ({ ...d }));
+  return prisma.department.findMany({ orderBy: { name: "asc" } });
 }
 
 export function getEmployees() {
-    return employees.map(e => ({ ...e }));
+  return prisma.employee.findMany({
+    orderBy: [{ lastName: "asc" }, { firstName: "asc" }]
+  });
 }
 
 export function createEmployee(input: { firstName: string; lastName: string; departmentId: string }) {
-    const emp = { id: makeEmpId(), ...input };
-    employees.push(emp);
-    return { ...emp };
+  return prisma.employee.create({ data: input });
 }

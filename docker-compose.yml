@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pixell_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pixell
+    ports:
+      - "5433:5432"
+    volumes:
+      - pixell_pgdata:/var/lib/postgresql/data
+
+volumes:
+  pixell_pgdata:

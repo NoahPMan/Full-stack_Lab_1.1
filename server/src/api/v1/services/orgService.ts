@@ -1,16 +1,29 @@
-import { getRoles, getRoleByName, assignPerson } from "../repos/orgRepo";
+import * as repo from "../repos/orgRepo";
 
-export function listRoles() {
-  return getRoles();
+export async function listRoles() {
+  return repo.getRoles();
 }
 
-export function addPersonToRole(input: { firstName: string; lastName: string; roleName: string }) {
-  const first = input.firstName?.trim() ?? "";
-  if (first.length < 3) return { ok: false, errors: [{ field: "firstName", message: "First name must be at least 3 characters." }] };
-  const roleName = input.roleName?.trim();
-  if (!roleName) return { ok: false, errors: [{ field: "roleName", message: "Role is required." }] };
-  const existing = getRoleByName(roleName);
-  if (existing?.assignee) return { ok: false, errors: [{ field: "roleName", message: "This role is already occupied." }] };
-  const role = assignPerson(roleName, first, (input.lastName ?? "").trim());
+export async function addPersonToRole(input: { firstName: string; lastName: string; roleName: string }) {
+  const errors: { field: "firstName" | "roleName" | "general"; message: string }[] = [];
+
+  const first = (input.firstName ?? "").trim();
+  if (first.length < 3) errors.push({ field: "firstName", message: "First name must be at least 3 characters." });
+
+  const roleName = (input.roleName ?? "").trim();
+  if (!roleName) errors.push({ field: "roleName", message: "Role is required." });
+
+  if (errors.length) return { ok: false, errors };
+
+  const existing = await repo.getRoleByName(roleName);
+  if (existing?.assigneeId) {
+    return { ok: false, errors: [{ field: "roleName", message: "This role is already occupied." }] };
+  }
+
+  const role = await repo.assignPerson(roleName, first, (input.lastName ?? "").trim());
+  if (!role) {
+    return { ok: false, errors: [{ field: "roleName", message: "This role is already occupied." }] };
+  }
+
   return { ok: true, role };
 }

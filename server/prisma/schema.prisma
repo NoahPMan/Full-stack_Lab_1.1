@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Department {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  employees Employee[]
+}
+
+model Employee {
+  id           String     @id @default(cuid())
+  firstName    String
+  lastName     String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  @@index([departmentId])
+}
+
+model Person {
+  id        String @id @default(cuid())
+  firstName String
+  lastName  String
+  role      Role?
+
+  @@unique([firstName, lastName])
+}
+
+model Role {
+  id         String  @id @default(cuid())
+  roleName   String  @unique
+  assigneeId String? @unique
+  assignee   Person? @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+}
