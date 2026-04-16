@@ -173,3 +173,16 @@ Overall, this lab moves the application from a prototype that relied on temporar
 ## Lab_5.1
 
 ### Description:
+
+In this lab, I added individual user authentication and protected “create” functionality using Clerk across both the frontend and backend.
+
+On the frontend, I integrated Clerk into my Vite + React app and wrapped the application with a Clerk provider so authentication state is available everywhere.
+I added login/logout controls directly into the navigation so users can sign in or sign out at any time. When a user is signed out, the application remains fully viewable (employees and organization roles still load), but entry creation is disabled.
+Instead of showing the entry forms, the Employees and Organization pages display a small message explaining that the user must log in, along with a login button.
+
+When a user is signed in, the entry forms become available again. For any action that creates data (POST requests), the frontend retrieves the user's session token and includes it in the Authorization header so requests are tied to an authenticated user session.
+
+On the backend, I installed and configured Clerk's Express middleware to verify incoming requests. All POST routes were protected so that attempts to create employees or assign roles are rejected unless the request is authenticated.
+This ensures that even if someone bypasses the UI and tries to call the API directly, the backend still enforces the “logged-in users only” rule for creating entries.
+
+Overall, this lab upgrades the application from “public write access” to a secure, user-authenticated flow where anonymous users can browse data but only logged-in users can create new records.
