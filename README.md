@@ -154,3 +154,22 @@ Dev: Nodemon, ts-node
 ## Lab_4.2
 
 ### Description:
+
+In this lab, I updated my full-stack Employee Directory / Organization application to use a real relational database instead of in-memory data.
+
+On the backend, I introduced Postgres as the database and used Prisma as the ORM. I modeled the application data using a normalized schema and created relations between entities such as departments, employees, and organizational roles.
+Prisma migrations were used to generate and apply the database schema, and a seed script was created to populate the database with initial data so the application is usable immediately.
+
+For local development, the backend connects to a local Postgres database using environment variables. For production, the backend is deployed on Vercel and connected to a hosted Postgres database provisioned through Neon.
+The backend reads its database connection details from environment variables injected by Vercel, allowing the same codebase to run in both local and deployment environments.
+
+The frontend remains a Vite + React single-page application. It now retrieves all employee and organization data from the backend API instead of relying on hardcoded data.
+A VITE_API_BASE_URL environment variable is used to point the frontend to the deployed backend. A rewrite configuration was added so that client-side routing continues to work correctly when refreshing pages in production.
+
+Overall, this lab moves the application from a prototype that relied on temporary data to a fully database-backed system with migrations, seeding, and a production-ready deployment setup.
+
+---
+
+## Lab_5.1
+
+### Description:
