@@ -1,52 +1,40 @@
+const BASE = import.meta.env.VITE_API_BASE_URL as string;
+
 export type OrgRole = {
   id: string;
   roleName: string;
   assignee?: { firstName: string; lastName: string };
 };
 
-const makeId = () => `role-${Math.random().toString(36).slice(2, 8)}`;
-
-let roles: OrgRole[] = [
-  { id: makeId(), roleName: "CEO" },
-  { id: makeId(), roleName: "CFO" },
-  { id: makeId(), roleName: "CTO" },
-  { id: makeId(), roleName: "COO" },
-];
+function baseUrl() {
+  const b = (BASE ?? "").trim();
+  return b.endsWith("/") ? b.slice(0, -1) : b;
+}
 
 export const orgRepo = {
-  getRoles(): OrgRole[] {
-    return roles.map(r => ({ ...r, assignee: r.assignee ? { ...r.assignee } : undefined }));
+  async getRoles(): Promise<OrgRole[]> {
+    const res = await fetch(`${baseUrl()}/api/v1/org/roles`);
+    if (!res.ok) throw new Error("Failed to fetch roles");
+    return res.json();
   },
 
-  getRoleByName(roleName: string): OrgRole | undefined {
-    return roles.find(r => r.roleName.toLowerCase() === roleName.toLowerCase());
-  },
+  async assignPerson(roleName: string, firstName: string, lastName: string, token: string): Promise<OrgRole> {
+    const res = await fetch(`${baseUrl()}/api/v1/org/roles/assign`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ roleName, firstName, lastName })
+    });
 
-  upsertRole(roleName: string): OrgRole {
-    const existing = orgRepo.getRoleByName(roleName);
-    if (existing) return { ...existing, assignee: existing.assignee ? { ...existing.assignee } : undefined };
-    const created: OrgRole = { id: makeId(), roleName };
-    roles = [...roles, created];
-    return { ...created };
-  },
+    const data = await res.json().catch(() => null);
 
-  assignPerson(roleName: string, firstName: string, lastName: string): OrgRole {
-    const existing = orgRepo.getRoleByName(roleName);
-    if (existing) {
-      const updated: OrgRole = { ...existing, assignee: { firstName, lastName } };
-      roles = roles.map(r => (r.id === existing.id ? updated : r));
-      return { ...updated, assignee: updated.assignee ? { ...updated.assignee } : undefined };
+    if (!res.ok) {
+      if (data && typeof data === "object") throw data;
+      throw new Error("Failed to assign person");
     }
-    const created: OrgRole = {
-      id: makeId(),
-      roleName,
-      assignee: { firstName, lastName },
-    };
-    roles = [...roles, created];
-    return { ...created, assignee: created.assignee ? { ...created.assignee } : undefined };
-  },
 
-  clearAssignee(roleId: string): void {
-    roles = roles.map(r => (r.id === roleId ? { ...r, assignee: undefined } : r));
-  },
+    return data;
+  }
 };
