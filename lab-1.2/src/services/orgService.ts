@@ -1,5 +1,3 @@
-import { orgRepo, type OrgRole } from "../repos/orgRepo";
-
 export type CreateOrgPersonInput = {
   firstName: string;
   lastName: string;
@@ -12,7 +10,7 @@ export type OrgServiceError = {
 };
 
 export type CreateOrgPersonResult =
-  | { ok: true; role: OrgRole }
+  | { ok: true }
   | { ok: false; errors: OrgServiceError[] };
 
 export const orgService = {
@@ -24,19 +22,13 @@ export const orgService = {
       errors.push({ field: "firstName", message: "First name must be at least 3 characters." });
     }
 
-    const roleName = input.roleName?.trim();
+    const roleName = input.roleName?.trim() ?? "";
     if (!roleName) {
       errors.push({ field: "roleName", message: "Role is required." });
     }
 
-    const existing = roleName ? orgRepo.getRoleByName(roleName) : undefined;
-    if (existing?.assignee) {
-      errors.push({ field: "roleName", message: "This role is already occupied." });
-    }
-
     if (errors.length) return { ok: false, errors };
 
-    const role = orgRepo.assignPerson(roleName!, first, (input.lastName ?? "").trim());
-    return { ok: true, role };
-  },
+    return { ok: true };
+  }
 };

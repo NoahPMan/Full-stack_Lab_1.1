@@ -29,3 +29,9 @@
   text-align: right;
   opacity: 0.9;
 }
+
+.org__error {
+  color: #ff6b6b;
+  margin-top: 0.5rem;
+  max-width: 760px;
+}

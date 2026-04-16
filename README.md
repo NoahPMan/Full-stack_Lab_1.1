@@ -154,3 +154,35 @@ Dev: Nodemon, ts-node
 ## Lab_4.2
 
 ### Description:
+
+In this lab, I updated my full-stack Employee Directory / Organization application to use a real relational database instead of in-memory data.
+
+On the backend, I introduced Postgres as the database and used Prisma as the ORM. I modeled the application data using a normalized schema and created relations between entities such as departments, employees, and organizational roles.
+Prisma migrations were used to generate and apply the database schema, and a seed script was created to populate the database with initial data so the application is usable immediately.
+
+For local development, the backend connects to a local Postgres database using environment variables. For production, the backend is deployed on Vercel and connected to a hosted Postgres database provisioned through Neon.
+The backend reads its database connection details from environment variables injected by Vercel, allowing the same codebase to run in both local and deployment environments.
+
+The frontend remains a Vite + React single-page application. It now retrieves all employee and organization data from the backend API instead of relying on hardcoded data.
+A VITE_API_BASE_URL environment variable is used to point the frontend to the deployed backend. A rewrite configuration was added so that client-side routing continues to work correctly when refreshing pages in production.
+
+Overall, this lab moves the application from a prototype that relied on temporary data to a fully database-backed system with migrations, seeding, and a production-ready deployment setup.
+
+---
+
+## Lab_5.1
+
+### Description:
+
+In this lab, I added individual user authentication and protected “create” functionality using Clerk across both the frontend and backend.
+
+On the frontend, I integrated Clerk into my Vite + React app and wrapped the application with a Clerk provider so authentication state is available everywhere.
+I added login/logout controls directly into the navigation so users can sign in or sign out at any time. When a user is signed out, the application remains fully viewable (employees and organization roles still load), but entry creation is disabled.
+Instead of showing the entry forms, the Employees and Organization pages display a small message explaining that the user must log in, along with a login button.
+
+When a user is signed in, the entry forms become available again. For any action that creates data (POST requests), the frontend retrieves the user's session token and includes it in the Authorization header so requests are tied to an authenticated user session.
+
+On the backend, I installed and configured Clerk's Express middleware to verify incoming requests. All POST routes were protected so that attempts to create employees or assign roles are rejected unless the request is authenticated.
+This ensures that even if someone bypasses the UI and tries to call the API directly, the backend still enforces the “logged-in users only” rule for creating entries.
+
+Overall, this lab upgrades the application from “public write access” to a secure, user-authenticated flow where anonymous users can browse data but only logged-in users can create new records.
