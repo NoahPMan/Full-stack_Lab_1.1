@@ -1,53 +1,38 @@
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { orgRepo, type OrgRole } from "../../repos/orgRepo";
 import OrgAddPersonForm from "../OrgAddPersonForm";
 import "./OrganizationPage.css";
 
 export default function OrganizationPage() {
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [roles, setRoles] = useState<OrgRole[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let mounted = true;
+  const {
+    data: roles = [],
+    isLoading,
+    isError,
+    error
+  } = useQuery({
+    queryKey: ["roles"],
+    queryFn: orgRepo.getRoles
+  });
 
-    setLoading(true);
-    setError(null);
-
-    orgRepo
-      .getRoles()
-      .then(data => {
-        if (!mounted) return;
-        setRoles(data);
-        setLoading(false);
-      })
-      .catch(e => {
-        if (!mounted) return;
-        setError(e?.message ?? "Failed to load roles");
-        setLoading(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [refreshKey]);
+  const message = (error as any)?.message ?? "Failed to load roles";
 
   return (
     <main className= "org" >
     <h1 className="org__title" > Organization </h1>
 
   {
-    loading ? (
+    isLoading ? (
       <div>Loading roles…</div>
-      ) : error ? (
+      ) : isError ? (
       <div className= "org__error" role = "alert" >
-        { error }
+        { message }
         </div>
       ) : (
       <div className= "org__list" >
       {
-        roles.map(r => (
+        roles.map((r: OrgRole) => (
           <div className= "org__row" key = { r.id } >
           <div className="org__name" >
           { r.assignee ? `${r.assignee.firstName} ${r.assignee.lastName}` : "Unassigned" }
@@ -61,8 +46,13 @@ export default function OrganizationPage() {
   }
 
   <hr />
-    < OrgAddPersonForm onAdded = {() => setRefreshKey(k => k + 1)
-} />
+
+    < OrgAddPersonForm
+  onAdded = {() => {
+    queryClient.invalidateQueries({ queryKey: ["roles"] });
+  }
+}
+      />
   </main>
   );
 }

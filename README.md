@@ -186,3 +186,28 @@ On the backend, I installed and configured Clerk's Express middleware to verify 
 This ensures that even if someone bypasses the UI and tries to call the API directly, the backend still enforces the “logged-in users only” rule for creating entries.
 
 Overall, this lab upgrades the application from “public write access” to a secure, user-authenticated flow where anonymous users can browse data but only logged-in users can create new records.
+
+---
+
+## Lab_5.2
+
+### Description:
+
+In this lab, I integrated a server-state management library (TanStack Query) into my full-stack Employee Directory / Organization application to refactor how the frontend loads and refreshes data. Previously, the app relied on multiple useEffect hooks, manual useState loading/error flags, and “refresh key” patterns to re-fetch data after changes.
+I replaced those scratch-built patterns with cached queries for GET requests and invalidation-based refetching after changes, so the UI stays in sync with the backend with less manual state handling.
+
+1. What change I wanted to make in my application
+   For Lab 5.2, I wanted to improve how my frontend manages server data and reduce the amount of manual fetch logic spread across components. Before this change, each page handled its own loading, error state, and refresh behavior using useEffect and local state variables.
+   This caused repeated boilerplate and made it easy to introduce inconsistent behavior across screens. I wanted a more reliable approach that treats backend data as “server state” and keeps it synchronized automatically after updates.
+
+2. What tool or tools I used to make this change
+   I used TanStack Query to manage server state in the React frontend. I created a shared QueryClient and wrapped the application with QueryClientProvider so queries and cached results are available throughout the app.
+   I refactored data loading to use useQuery for GET endpoints (employees, departments, roles), and replaced manual refresh triggers with query invalidation so updated data refetches automatically when needed. This reduced the need for custom refresh keys and centralized how loading and error states are handled.
+
+3. How this change affects the user experience
+   This change improves the user experience by making the application feel faster and more consistent. Because server data is cached, returning to a page or switching between views can show data without unnecessary refetch flicker.
+   Loading and error handling also becomes more predictable across the app because it comes from the same query state model. After a successful create action, the relevant list updates without the user needing to manually refresh or rely on custom “refresh key” behavior, which makes the UI feel more responsive.
+
+4. How this change affects my understanding or conceptualization of the app
+   This lab changed how I think about state in a full-stack React app. I now separate “client/UI state” from “server state” more clearly. Client state is things like form inputs and view toggles, while server state is data that lives in the backend and can change outside my control.
+   Using TanStack Query helped me conceptualize backend data as cached resources identified by query keys, with explicit rules for when data is considered stale and when it should refresh. This approach is cleaner than manually rebuilding fetching logic in every component.
